@@ -59,7 +59,7 @@ end)
 -- Layout
 local title = Instance.new("TextLabel", mainFrame)
 title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "🔥 ULTRA MENU 🔥"
+title.Text = "🔥✇ SHARINGAN MODMENU ✇🔥"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 title.Font = Enum.Font.GothamBold
