@@ -72,7 +72,7 @@ layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Botões
+-- Botões toggle
 local function createToggleButton(label, key)
     local btn = Instance.new("TextButton", mainFrame)
     btn.Size = UDim2.new(0.9, 0, 0, 30)
@@ -89,34 +89,65 @@ local function createToggleButton(label, key)
     end)
 end
 
--- Sliders
-local function createSlider(label, min, max, key)
+-- Slider com botões para FOV e Smoothness
+local function createSliderWithButtons(label, min, max, key, step)
+    step = step or 0.1
     local frame = Instance.new("Frame", mainFrame)
     frame.Size = UDim2.new(0.9, 0, 0, 30)
     frame.BackgroundTransparency = 1
 
     local lbl = Instance.new("TextLabel", frame)
-    lbl.Size = UDim2.new(0.5, 0, 1, 0)
+    lbl.Size = UDim2.new(0.3, 0, 1, 0)
     lbl.Text = label
     lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
     lbl.BackgroundTransparency = 1
     lbl.Font = Enum.Font.Gotham
     lbl.TextSize = 14
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
 
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(0.5, 0, 1, 0)
-    btn.Position = UDim2.new(0.5, 0, 0, 0)
-    btn.Text = string.format("%.1f", settings[key])
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local valueLabel = Instance.new("TextLabel", frame)
+    valueLabel.Size = UDim2.new(0.2, 0, 1, 0)
+    valueLabel.Position = UDim2.new(0.3, 0, 0, 0)
+    valueLabel.Text = string.format("%.1f", settings[key])
+    valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Font = Enum.Font.Gotham
+    valueLabel.TextSize = 14
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Center
 
-    btn.MouseButton1Click:Connect(function()
-        settings[key] = settings[key] + 0.1
-        if settings[key] > max then settings[key] = min end
-        btn.Text = string.format("%.1f", settings[key])
+    local btnMinus = Instance.new("TextButton", frame)
+    btnMinus.Size = UDim2.new(0.15, 0, 1, 0)
+    btnMinus.Position = UDim2.new(0.5, 0, 0, 0)
+    btnMinus.Text = "−"
+    btnMinus.Font = Enum.Font.GothamBold
+    btnMinus.TextSize = 24
+    btnMinus.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnMinus.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btnMinus.AutoButtonColor = true
+    Instance.new("UICorner", btnMinus).CornerRadius = UDim.new(0, 6)
+
+    local btnPlus = Instance.new("TextButton", frame)
+    btnPlus.Size = UDim2.new(0.15, 0, 1, 0)
+    btnPlus.Position = UDim2.new(0.7, 0, 0, 0)
+    btnPlus.Text = "+"
+    btnPlus.Font = Enum.Font.GothamBold
+    btnPlus.TextSize = 24
+    btnPlus.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnPlus.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btnPlus.AutoButtonColor = true
+    Instance.new("UICorner", btnPlus).CornerRadius = UDim.new(0, 6)
+
+    local function updateValue(delta)
+        settings[key] = math.clamp(settings[key] + delta, min, max)
+        valueLabel.Text = string.format("%.1f", settings[key])
+    end
+
+    btnMinus.MouseButton1Click:Connect(function()
+        updateValue(-step)
+    end)
+
+    btnPlus.MouseButton1Click:Connect(function()
+        updateValue(step)
     end)
 end
 
@@ -158,14 +189,17 @@ local function createRGBSlider()
     end
 end
 
--- Menu Botões
+-- Criando botões toggle
 createToggleButton("Aimbot", "aimbot")
 createToggleButton("ESP", "esp")
 createToggleButton("Highlight ESP", "highlightESP")
 createToggleButton("Safe Mode", "safeMode")
 createToggleButton("Team Check", "teamCheck")
-createSlider("Smoothness", 0.1, 1.0, "smoothness")
-createSlider("FOV", 10, 200, "fov")
+
+-- Usando sliders com botões para smoothness e fov
+createSliderWithButtons("Smoothness", 0.1, 1.0, "smoothness", 0.1)
+createSliderWithButtons("FOV", 10, 200, "fov", 1)
+
 createRGBSlider()
 
 UserInputService.InputBegan:Connect(function(input)
